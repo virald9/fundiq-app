@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FundIQ — AI Mutual Fund Research</title>
+<meta name="description" content="AI-powered research for 2,500+ Indian mutual funds. Compare, screen, track portfolios.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─── DESIGN DIRECTION: Refined editorial · Warm off-white · Serif display · Subtle green ─── */
+:root {
+  --bg:       #f7f5f0;
+  --bg2:      #f0ede6;
+  --bg3:      #e8e4db;
+  --white:    #ffffff;
+  --surface:  #ffffff;
+  --surface2: #f7f5f0;
+
+  --ink:      #1a1a18;
+  --ink2:     #4a4a44;
+  --ink3:     #8a8a80;
+  --ink4:     #b8b8b0;
+
+  --green:    #1a7a4a;
+  --green2:   #22a060;
+  --green3:   #e8f5ee;
+  --green4:   #d0eddc;
+  --greenA:   rgba(26,122,74,.12);
+
+  --gold:     #b8860b;
+  --red:      #c0392b;
+  --blue:     #1a5276;
+
+  --border:   #e0ddd6;
+  --border2:  #ccc9c0;
+
+  --r:  10px;
+  --rs: 6px;
+  --rl: 16px;
+
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans:  'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 62px;
+  background: rgba(247,245,240,.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 36px;
+}
+.logo {
+  font-family: var(--serif);
+  font-size: 22px; font-weight: 700;
+  color: var(--ink); letter-spacing: -0.3px;
+  cursor: pointer;
+}
+.logo em { color: var(--green); font-style: normal; }
+.nav-links { display: flex; gap: 2px; }
+.nav-tab {
+  font-family: var(--sans); font-size: 13.5px; font-weight: 400;
+  color: var(--ink3); padding: 6px 14px; border-radius: var(--rs);
+  border: none; background: none; cursor: pointer; transition: all .2s;
+}
+.nav-tab:hover { color: var(--ink); background: var(--bg2); }
+.nav-tab.active { color: var(--green); background: var(--green3); font-weight: 500; }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-plan-badge {
+  font-size: 11px; color: var(--ink3);
+  border: 1px solid var(--border2); border-radius: 100px;
+  padding: 4px 10px; background: var(--white);
+}
+.nav-cta {
+  background: var(--green); color: #fff;
+  font-family: var(--sans); font-size: 13px; font-weight: 600;
+  padding: 8px 20px; border-radius: var(--rs);
+  border: none; cursor: pointer; transition: all .2s;
+  letter-spacing: 0.1px;
+}
+.nav-cta:hover { background: var(--green2); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(26,122,74,.25); }
+
+/* ─── SECTIONS ─── */
+.sec { display: none; padding-top: 62px; min-height: 100vh; }
+.sec.active { display: block; }
+
+/* ─── HERO ─── */
+.hero {
+  min-height: calc(100vh - 62px);
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: center; gap: 60px;
+  padding: 80px 72px 80px 72px;
+  position: relative; overflow: hidden;
+}
+
+/* Subtle dot grid */
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, var(--border2) 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: 0.4;
+  pointer-events: none;
+}
+/* Warm glow blob */
+.hero::after {
+  content: '';
+  position: absolute; right: -100px; top: -100px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle at 50% 50%, rgba(26,122,74,.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-left { position: relative; z-index: 1; }
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--green3); border: 1px solid var(--green4);
+  color: var(--green); font-size: 12px; font-weight: 500;
+  padding: 5px 12px; border-radius: 100px; margin-bottom: 28px;
+  animation: riseUp .5s ease both;
+}
+.eyebrow-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.5)} }
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(44px, 5.5vw, 72px);
+  font-weight: 700; line-height: 1.08;
+  letter-spacing: -1.5px;
+  color: var(--ink);
+  margin-bottom: 20px;
+  animation: riseUp .6s .1s ease both;
+}
+.hero-title .hl { color: var(--green); font-style: italic; }
+.hero-title .dim { color: var(--ink4); }
+
+.hero-sub {
+  font-size: 17px; color: var(--ink2); font-weight: 300;
+  line-height: 1.7; max-width: 460px; margin-bottom: 36px;
+  animation: riseUp .6s .2s ease both;
+}
+
+.hero-actions {
+  display: flex; gap: 12px; margin-bottom: 48px;
+  animation: riseUp .6s .3s ease both;
+}
+.btn-primary {
+  background: var(--green); color: #fff;
+  font-family: var(--sans); font-size: 15px; font-weight: 600;
+  padding: 13px 26px; border-radius: var(--rs); border: none; cursor: pointer;
+  transition: all .25s; letter-spacing: 0.1px;
+}
+.btn-primary:hover { background: var(--green2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,122,74,.28); }
+.btn-ghost {
+  background: var(--white); color: var(--ink);
+  font-family: var(--sans); font-size: 15px; font-weight: 500;
+  padding: 13px 26px; border-radius: var(--rs);
+  border: 1px solid var(--border2); cursor: pointer; transition: all .25s;
+}
+.btn-ghost:hover { background: var(--bg2); border-color: var(--ink4); transform: translateY(-2px); }
+
+.hero-stats {
+  display: flex; gap: 32px;
+  animation: riseUp .6s .4s ease both;
+}
+.h-stat { }
+.h-stat-n {
+  font-family: var(--serif); font-size: 26px; font-weight: 700;
+  color: var(--ink); line-height: 1;
+}
+.h-stat-l { font-size: 12px; color: var(--ink3); margin-top: 3px; font-weight: 400; }
+.stat-div { width: 1px; background: var(--border2); align-self: stretch; }
+
+@keyframes riseUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+/* Hero right — live data panel */
+.hero-right {
+  position: relative; z-index: 1;
+  animation: riseUp .7s .3s ease both;
+}
+.data-panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--rl);
+  box-shadow: 0 8px 48px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.04);
+  overflow: hidden;
+}
+.dp-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.dp-title { font-size: 13px; font-weight: 600; color: var(--ink); }
+.dp-live {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--green); font-weight: 500;
+}
+.dp-live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); animation: pulse 2s infinite;
+}
+.dp-fund {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  transition: background .15s; cursor: pointer;
+}
+.dp-fund:last-child { border-bottom: none; }
+.dp-fund:hover { background: var(--bg); }
+.dp-fund-left { }
+.dp-fund-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+.dp-fund-meta { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+.dp-fund-right { text-align: right; }
+.dp-nav { font-family: var(--serif); font-size: 17px; font-weight: 700; color: var(--ink); }
+.dp-return { font-size: 12px; font-weight: 600; color: var(--green); margin-top: 2px; }
+.dp-return.neg { color: var(--red); }
+.dp-sparkline {
+  display: flex; align-items: flex-end; gap: 2px; height: 28px;
+}
+.sp-bar {
+  width: 5px; border-radius: 2px 2px 0 0;
+  background: var(--green4); transition: background .2s;
+}
+.sp-bar.high { background: var(--green); }
+
+.dp-footer {
+  padding: 12px 20px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.dp-footer-text { font-size: 11px; color: var(--ink3); }
+.dp-refresh {
+  font-size: 11px; color: var(--green); font-weight: 500; cursor: pointer;
+  border: none; background: none; font-family: var(--sans);
+}
+
+/* ─── TRUST STRIP ─── */
+.trust-strip {
+  background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 16px 72px; display: flex; align-items: center; gap: 48px;
+}
+.trust-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--ink2); font-weight: 400; white-space: nowrap;
+}
+.trust-icon { font-size: 16px; }
+.trust-div { flex: 1; height: 1px; background: var(--border); }
+
+/* ─── FEATURES ─── */
+.features {
+  padding: 80px 72px;
+  max-width: 1200px; margin: 0 auto;
+}
+.section-label {
+  font-size: 11px; font-weight: 600; color: var(--green); letter-spacing: 2px;
+  text-transform: uppercase; margin-bottom: 12px;
+}
+.section-title {
+  font-family: var(--serif); font-size: clamp(30px,3.5vw,44px);
+  font-weight: 700; color: var(--ink); letter-spacing: -1px;
+  margin-bottom: 48px; max-width: 500px; line-height: 1.15;
+}
+.feat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.feat-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 28px;
+  transition: all .3s; cursor: pointer;
+}
+.feat-card:hover {
+  border-color: var(--green4); transform: translateY(-4px);
+  box-shadow: 0 12px 36px rgba(0,0,0,.08);
+}
+.feat-num {
+  font-family: var(--serif); font-size: 13px; font-weight: 700;
+  color: var(--green3); background: var(--green3);
+  color: var(--green); width: 32px; height: 32px; border-radius: var(--rs);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; margin-bottom: 16px;
+}
+.feat-title { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+.feat-desc { font-size: 13px; color: var(--ink2); line-height: 1.65; font-weight: 300; }
+
+/* ─── CHAT ─── */
+.chat-layout {
+  display: grid; grid-template-columns: 264px 1fr;
+  height: calc(100vh - 62px); overflow: hidden;
+}
+.c-sidebar {
+  background: var(--white); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.c-s-top {
+  padding: 16px; border-bottom: 1px solid var(--border);
+}
+.c-s-label {
+  font-size: 11px; font-weight: 600; color: var(--ink3);
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+}
+.c-search-wrap {
+  display: flex; gap: 6px; align-items: center;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--rs); padding: 8px 10px;
+}
+.c-search-wrap input {
+  flex: 1; background: none; border: none; outline: none;
+  font-family: var(--sans); font-size: 13px; color: var(--ink);
+}
+.c-search-wrap input::placeholder { color: var(--ink4); }
+.c-new-btn {
+  margin: 10px; padding: 9px 13px;
+  background: var(--green3); color: var(--green);
+  border: 1px solid var(--green4);
+  border-radius: var(--rs); font-size: 13px; font-weight: 500;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  font-family: var(--sans); transition: all .2s;
+}
+.c-new-btn:hover { background: var(--green4); }
+.c-prompts { flex: 1; overflow-y: auto; padding: 6px; }
+.c-prompt-group-label {
+  font-size: 10px; font-weight: 600; color: var(--ink4);
+  text-transform: uppercase; letter-spacing: 1px;
+  padding: 8px 8px 4px;
+}
+.p-chip {
+  padding: 9px 10px; border-radius: var(--rs); cursor: pointer;
+  font-size: 12.5px; color: var(--ink2); line-height: 1.4;
+  transition: all .15s; margin-bottom: 2px;
+}
+.p-chip:hover { background: var(--bg); color: var(--ink); }
+.c-sidebar::-webkit-scrollbar,
+.c-prompts::-webkit-scrollbar { width: 3px; }
+.c-sidebar::-webkit-scrollbar-thumb,
+.c-prompts::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.c-main { display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+.c-msgs {
+  flex: 1; overflow-y: auto; padding: 28px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+.c-msgs::-webkit-scrollbar { width: 4px; }
+.c-msgs::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.msg { max-width: 720px; }
+.msg.user { align-self: flex-end; }
+.msg .lbl {
+  font-size: 11px; color: var(--ink3); margin-bottom: 6px;
+  display: flex; align-items: center; gap: 5px; font-weight: 500;
+}
+.ai-avatar {
+  width: 18px; height: 18px; border-radius: 4px;
+  background: var(--green); display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: #fff; font-weight: 700; flex-shrink: 0;
+}
+.bubble {
+  padding: 14px 18px; font-size: 14px; line-height: 1.75;
+  border-radius: var(--r);
+}
+.msg.user .bubble {
+  background: var(--green); color: #fff;
+  border-radius: var(--r) var(--r) 4px var(--r);
+  font-weight: 400;
+}
+.msg.bot .bubble {
+  background: var(--white); border: 1px solid var(--border);
+  color: var(--ink); border-radius: var(--r) var(--r) var(--r) 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.typing { display: flex; gap: 4px; align-items: center; padding: 2px 0; }
+.td { width: 6px; height: 6px; border-radius: 50%; background: var(--ink4); animation: tb 1.2s infinite; }
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tb{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+.c-input-area {
+  padding: 16px 24px; border-top: 1px solid var(--border);
+  background: var(--white);
+}
+.c-input-wrap {
+  display: flex; gap: 10px; align-items: flex-end;
+  background: var(--bg); border: 1.5px solid var(--border2);
+  border-radius: var(--r); padding: 10px 14px; transition: border-color .2s;
+}
+.c-input-wrap:focus-within { border-color: var(--green); }
+.c-textarea {
+  flex: 1; background: none; border: none; outline: none;
+  color: var(--ink); font-size: 14px; resize: none;
+  font-family: var(--sans); line-height: 1.5;
+  max-height: 120px; min-height: 22px;
+}
+.c-textarea::placeholder { color: var(--ink4); }
+.c-send {
+  background: var(--green); color: #fff; border: none; cursor: pointer;
+  width: 34px; height: 34px; border-radius: var(--rs);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; transition: all .2s; flex-shrink: 0;
+}
+.c-send:hover { background: var(--green2); }
+.c-hint { font-size: 11px; color: var(--ink4); text-align: center; margin-top: 8px; }
+
+/* ─── SCREENER ─── */
+.scr-layout { padding: 28px 32px; }
+.pg-header { margin-bottom: 24px; }
+.pg-title { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.pg-sub { font-size: 13px; color: var(--ink3); display: flex; align-items: center; gap: 8px; }
+.live-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--green3); color: var(--green);
+  font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 100px;
+}
+.live-pip { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+
+.filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; align-items: center; }
+.fsel {
+  background: var(--white); border: 1px solid var(--border2); color: var(--ink);
+  padding: 8px 12px; border-radius: var(--rs); font-size: 13px;
+  font-family: var(--sans); cursor: pointer; outline: none; transition: border-color .2s;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8a80' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
+}
+.fsel:focus { border-color: var(--green); }
+.scr-search {
+  background: var(--white); border: 1px solid var(--border2); color: var(--ink);
+  padding: 8px 12px; border-radius: var(--rs); font-size: 13px;
+  font-family: var(--sans); outline: none; width: 220px; transition: border-color .2s;
+}
+.scr-search::placeholder { color: var(--ink4); }
+.scr-search:focus { border-color: var(--green); }
+
+.tbl-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.scr-tbl { width: 100%; border-collapse: collapse; min-width: 820px; }
+.scr-tbl thead { background: var(--bg); }
+.scr-tbl th {
+  text-align: left; padding: 11px 16px;
+  font-size: 11px; font-weight: 600; color: var(--ink3);
+  text-transform: uppercase; letter-spacing: 0.6px;
+  border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; white-space: nowrap;
+}
+.scr-tbl th:hover { color: var(--ink2); }
+.scr-tbl th.sorted { color: var(--green); }
+.scr-tbl td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+.scr-tbl tr:last-child td { border-bottom: none; }
+.scr-tbl tbody tr { transition: background .12s; }
+.scr-tbl tbody tr:hover td { background: var(--bg); }
+.tag { display: inline-block; padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+.t-eq { background: var(--green3); color: var(--green); }
+.t-de { background: #dbeafe; color: #1d4ed8; }
+.t-hy { background: #fef9c3; color: #a16207; }
+.rp { color: var(--green); font-weight: 600; }
+.rn { color: var(--red); font-weight: 600; }
+.fn { font-weight: 500; color: var(--ink); }
+.fm { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+.stars { color: #f59e0b; font-size: 11px; letter-spacing: -1px; }
+.nav-val { font-family: var(--serif); font-weight: 700; font-size: 14px; color: var(--ink); }
+.mini-chart { display: flex; align-items: flex-end; gap: 2px; height: 32px; width: 56px; }
+.mb { flex: 1; border-radius: 1px 1px 0 0; }
+
+/* ─── PORTFOLIO ─── */
+.port-layout { padding: 28px 32px; }
+.upload-card {
+  background: var(--white); border: 2px dashed var(--border2);
+  border-radius: var(--r); padding: 52px; text-align: center;
+  cursor: pointer; transition: all .25s; margin-bottom: 22px;
+}
+.upload-card:hover { border-color: var(--green); background: var(--green3); }
+.u-icon { font-size: 32px; margin-bottom: 12px; }
+.u-title { font-size: 16px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+.u-sub { font-size: 13px; color: var(--ink3); }
+.u-link { color: var(--green); font-weight: 500; cursor: pointer; }
+
+.kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
+.kpi {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 18px;
+}
+.kpi-label { font-size: 11px; font-weight: 600; color: var(--ink3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.kpi-val { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--ink); }
+.kpi-val.g { color: var(--green); }
+.kpi-val.r { color: var(--red); }
+.kpi-sub { font-size: 12px; color: var(--ink3); margin-top: 4px; }
+.port-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.pcard { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; }
+.pcard-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 16px; }
+.h-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.h-row:last-child { border-bottom: none; }
+.hbar { width: 4px; height: 36px; border-radius: 2px; flex-shrink: 0; }
+.hi { flex: 1; }
+.hn { font-size: 13px; font-weight: 500; color: var(--ink); }
+.hm { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+.ha { text-align: right; }
+.hv { font-size: 13px; font-weight: 600; color: var(--ink); }
+.hg { font-size: 11px; color: var(--green); font-weight: 500; }
+.hg.neg { color: var(--red); }
+.alloc-bar { height: 7px; background: var(--bg2); border-radius: 4px; overflow: hidden; display: flex; margin: 12px 0; }
+.a-seg { height: 100%; }
+.overlap-tbl { width: 100%; border-collapse: collapse; }
+.overlap-tbl th { font-size: 11px; color: var(--ink3); font-weight: 600; padding: 5px 8px; text-align: left; }
+.overlap-tbl td { font-size: 12px; padding: 8px; border-top: 1px solid var(--border); }
+.sev-h { color: var(--red); font-weight: 600; }
+.sev-m { color: var(--gold); font-weight: 600; }
+.sev-l { color: var(--green); font-weight: 600; }
+.ai-hint {
+  margin-top: 14px; background: #fffbeb; border: 1px solid #fde68a;
+  border-radius: var(--rs); padding: 12px; font-size: 13px; color: #92400e; line-height: 1.5;
+}
+.tax-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.tax-cell {
+  background: var(--bg); border-radius: var(--rs); padding: 12px;
+  border: 1px solid var(--border);
+}
+.tax-label { font-size: 11px; color: var(--ink3); margin-bottom: 5px; font-weight: 500; }
+.tax-val { font-family: var(--serif); font-size: 17px; font-weight: 700; }
+.tax-sub { font-size: 11px; color: var(--ink3); margin-top: 3px; }
+
+/* ─── PRICING ─── */
+.pricing-layout { padding: 72px 72px; }
+.pricing-head { text-align: center; margin-bottom: 56px; }
+.pricing-title { font-family: var(--serif); font-size: clamp(34px,4vw,52px); font-weight: 700; letter-spacing: -1.5px; color: var(--ink); line-height: 1.1; margin-bottom: 12px; }
+.pricing-title .hl { color: var(--green); font-style: italic; }
+.pricing-sub { font-size: 17px; color: var(--ink2); font-weight: 300; margin-bottom: 24px; }
+.price-toggle { display: inline-flex; background: var(--white); border: 1px solid var(--border2); border-radius: 100px; padding: 4px; }
+.pt-opt { padding: 8px 20px; border-radius: 100px; font-size: 13px; cursor: pointer; color: var(--ink3); font-family: var(--sans); border: none; background: none; transition: all .2s; }
+.pt-opt.active { background: var(--green); color: #fff; font-weight: 600; }
+.save-chip { background: var(--green3); color: var(--green); font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; margin-left: 5px; }
+
+.plans { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; max-width: 1080px; margin: 0 auto 52px; }
+.plan {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--rl); padding: 26px; position: relative; transition: all .25s;
+}
+.plan:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,.08); }
+.plan.hot { border-color: var(--green); border-width: 2px; }
+.plan.hot::before {
+  content: 'Most Popular';
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: var(--green); color: #fff;
+  font-size: 11px; font-weight: 700; padding: 3px 14px; border-radius: 100px;
+  white-space: nowrap; font-family: var(--sans);
+}
+.plan-tier { font-size: 11px; font-weight: 700; color: var(--ink3); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px; }
+.plan-price { font-family: var(--serif); font-size: 34px; font-weight: 700; color: var(--ink); line-height: 1; }
+.plan-period { font-size: 13px; color: var(--ink3); margin-top: 4px; margin-bottom: 6px; }
+.plan-saving { font-size: 12px; color: var(--green); font-weight: 500; min-height: 18px; margin-bottom: 18px; }
+.plan-div { height: 1px; background: var(--border); margin-bottom: 18px; }
+.plan-feat { display: flex; gap: 8px; font-size: 13px; color: var(--ink2); margin-bottom: 9px; line-height: 1.4; }
+.fck { color: var(--green); flex-shrink: 0; font-weight: 700; margin-top: 1px; }
+.fx { color: var(--ink4); flex-shrink: 0; margin-top: 1px; }
+.plan-btn {
+  width: 100%; padding: 11px; border-radius: var(--rs);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: var(--sans); transition: all .2s; margin-top: 16px;
+}
+.pb-out { background: none; border: 1.5px solid var(--border2); color: var(--ink2); }
+.pb-out:hover { border-color: var(--ink4); color: var(--ink); background: var(--bg); }
+.pb-fill { background: var(--green); color: #fff; border: none; }
+.pb-fill:hover { background: var(--green2); transform: translateY(-1px); }
+.pb-grn { background: none; border: 1.5px solid var(--green); color: var(--green); }
+.pb-grn:hover { background: var(--green3); }
+
+.rzp-bar {
+  max-width: 700px; margin: 0 auto 40px;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 16px 20px;
+  display: flex; align-items: center; gap: 14px;
+}
+.rzp-icon { font-size: 22px; }
+.rzp-txt { font-size: 13px; color: var(--ink2); line-height: 1.5; }
+.rzp-txt strong { color: var(--ink); }
+
+.comp-section { max-width: 980px; margin: 0 auto; }
+.comp-title { font-family: var(--serif); font-size: 22px; font-weight: 700; text-align: center; color: var(--ink); margin-bottom: 20px; }
+.comp-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r); }
+.ctbl { width: 100%; border-collapse: collapse; background: var(--white); }
+.ctbl thead { background: var(--bg); }
+.ctbl th { padding: 12px 16px; font-size: 11px; font-weight: 700; text-align: center; color: var(--ink3); text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--border); }
+.ctbl th:first-child { text-align: left; }
+.ctbl td { padding: 12px 16px; font-size: 13px; text-align: center; border-bottom: 1px solid var(--border); color: var(--ink2); }
+.ctbl td:first-child { text-align: left; color: var(--ink); font-weight: 500; }
+.ctbl tr:last-child td { border-bottom: none; }
+.ctbl tbody tr:hover td { background: var(--bg); }
+.ck { color: var(--green); font-weight: 700; }
+.cd { color: var(--ink4); }
+
+/* ─── MODAL ─── */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(26,26,24,.5);
+  z-index: 500; display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(6px); opacity: 0; pointer-events: none; transition: opacity .25s;
+}
+.modal-bg.open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--rl); padding: 32px; width: 92%; max-width: 480px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.12);
+  transform: translateY(16px); transition: transform .25s;
+  position: relative;
+}
+.modal-bg.open .modal { transform: translateY(0); }
+.modal-x { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--ink3); font-size: 18px; cursor: pointer; }
+.modal-title { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.modal-sub { font-size: 13px; color: var(--ink2); margin-bottom: 22px; line-height: 1.5; }
+.form-g { margin-bottom: 14px; }
+.form-l { font-size: 12px; font-weight: 600; color: var(--ink2); margin-bottom: 5px; display: block; }
+.form-in {
+  width: 100%; background: var(--bg); border: 1.5px solid var(--border2);
+  color: var(--ink); padding: 10px 13px; border-radius: var(--rs);
+  font-size: 14px; font-family: var(--sans); outline: none; transition: border-color .2s;
+}
+.form-in:focus { border-color: var(--green); background: var(--white); }
+.form-in::placeholder { color: var(--ink4); }
+.plan-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.plan-opt {
+  border: 1.5px solid var(--border2); border-radius: var(--rs); padding: 13px;
+  cursor: pointer; transition: all .2s;
+}
+.plan-opt.sel { border-color: var(--green); background: var(--green3); }
+.plan-opt-tier { font-size: 11px; font-weight: 600; color: var(--ink3); margin-bottom: 4px; }
+.plan-opt-price { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--ink); }
+.plan-opt-note { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+.modal-submit {
+  width: 100%; background: var(--green); color: #fff;
+  font-weight: 700; font-size: 15px; padding: 13px; border-radius: var(--rs);
+  cursor: pointer; border: none; font-family: var(--sans); transition: all .2s;
+}
+.modal-submit:hover { background: var(--green2); transform: translateY(-1px); }
+.modal-note { font-size: 11px; color: var(--ink4); text-align: center; margin-top: 10px; }
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 600;
+  background: var(--ink); color: #fff; border-radius: var(--r);
+  padding: 12px 18px; font-size: 13px;
+  display: flex; align-items: center; gap: 10px;
+  transform: translateY(70px); opacity: 0; transition: all .3s;
+  max-width: 320px; box-shadow: 0 8px 24px rgba(0,0,0,.2);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.ok { background: var(--green); }
+.toast.err { background: var(--red); }
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid var(--border); padding: 20px 72px 32px;
+  font-size: 11.5px; color: var(--ink4); line-height: 1.7;
+}
+
+/* ─── UTILS ─── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border2); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media(max-width:900px){
+  .hero { grid-template-columns: 1fr; padding: 40px 24px; }
+  .hero-right { display: none; }
+  .trust-strip { padding: 14px 24px; gap: 20px; overflow-x: auto; }
+  .features { padding: 48px 24px; }
+  .feat-grid { grid-template-columns: 1fr 1fr; }
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .port-grid { grid-template-columns: 1fr; }
+  .plans { grid-template-columns: 1fr 1fr; }
+  .pricing-layout { padding: 48px 24px; }
+  .scr-layout, .port-layout { padding: 20px 16px; }
+  .chat-layout { grid-template-columns: 1fr; }
+  .c-sidebar { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="logo" onclick="showSec('home')">Fund<em>IQ</em></div>
+  <div class="nav-links">
+    <button class="nav-tab active" onclick="showSec('home',this)">Home</button>
+    <button class="nav-tab" onclick="showSec('chat',this)">Ask AI</button>
+    <button class="nav-tab" onclick="showSec('screener',this)">Screener</button>
+    <button class="nav-tab" onclick="showSec('portfolio',this)">Portfolio</button>
+    <button class="nav-tab" onclick="showSec('pricing',this)">Pricing</button>
+  </div>
+  <div class="nav-right">
+    <span class="nav-plan-badge" id="nav-plan">Free Plan</span>
+    <button class="nav-cta" onclick="openModal()">Upgrade →</button>
+  </div>
+</nav>
+
+<!-- ─── TOAST ─── -->
+<div class="toast" id="toast"></div>
+
+<!-- ─── MODAL ─── -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <div class="modal-title">Upgrade your plan</div>
+    <div class="modal-sub">Get 500 AI queries, CAS import, overlap analyser, and daily alerts.</div>
+    <div class="form-g"><label class="form-l">Full Name</label><input class="form-in" id="up-name" placeholder="Rahul Sharma" type="text"></div>
+    <div class="form-g"><label class="form-l">Email Address</label><input class="form-in" id="up-email" placeholder="rahul@example.com" type="email"></div>
+    <div class="form-g"><label class="form-l">Phone Number</label><input class="form-in" id="up-phone" placeholder="+91 98765 43210" type="tel"></div>
+    <div class="plan-opts">
+      <div class="plan-opt sel" id="opt-py" onclick="selPlan(this,'premium_yearly')">
+        <div class="plan-opt-tier">Premium · Yearly</div>
+        <div class="plan-opt-price">₹5,999</div>
+        <div class="plan-opt-note">Save 40% · ~₹500/mo</div>
+      </div>
+      <div class="plan-opt" id="opt-pm" onclick="selPlan(this,'premium_monthly')">
+        <div class="plan-opt-tier">Premium · Monthly</div>
+        <div class="plan-opt-price">₹833</div>
+        <div class="plan-opt-note">per month</div>
+      </div>
+    </div>
+    <button class="modal-submit" onclick="pay()">Continue to Razorpay →</button>
+    <div class="modal-note">🔒 Secured by Razorpay · UPI · Cards · NetBanking · Cancel anytime</div>
+  </div>
+</div>
+
+<!-- ════════════════ HOME ════════════════ -->
+<section id="home" class="sec active">
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow"><span class="eyebrow-dot"></span>India's AI MF Research Platform</div>
+      <h1 class="hero-title">
+        Research MFs<br>
+        <span class="hl">like a Pro.</span><br>
+        <span class="dim">Not a gamble.</span>
+      </h1>
+      <p class="hero-sub">AI-powered analysis of 2,500+ Indian mutual funds. Compare, screen, and track portfolios — pure intelligence, no execution.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="showSec('chat',document.querySelectorAll('.nav-tab')[1])">Ask AI Now →</button>
+        <button class="btn-ghost" onclick="showSec('screener',document.querySelectorAll('.nav-tab')[2])">Live Screener</button>
+      </div>
+      <div class="hero-stats">
+        <div class="h-stat"><div class="h-stat-n">2,500+</div><div class="h-stat-l">Mutual Funds</div></div>
+        <div class="stat-div"></div>
+        <div class="h-stat"><div class="h-stat-n">Free</div><div class="h-stat-l">To Start</div></div>
+        <div class="stat-div"></div>
+        <div class="h-stat"><div class="h-stat-n">Live</div><div class="h-stat-l">AMFI Data</div></div>
+        <div class="stat-div"></div>
+        <div class="h-stat"><div class="h-stat-n">AI</div><div class="h-stat-l">Powered</div></div>
+      </div>
+    </div>
+
+    <!-- Live data panel -->
+    <div class="hero-right">
+      <div class="data-panel">
+        <div class="dp-header">
+          <div class="dp-title">Live NAV — Top Funds</div>
+          <div class="dp-live"><span class="dp-live-dot"></span> AMFI Live</div>
+        </div>
+
+        <div class="dp-fund" onclick="askQ('Tell me about Parag Parikh Flexi Cap Fund — returns, expense ratio, and peer comparison.')">
+          <div class="dp-fund-left">
+            <div class="dp-fund-name">Parag Parikh Flexi Cap</div>
+            <div class="dp-fund-meta">Direct Growth · Flexi Cap · PPFAS</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="dp-sparkline" id="sp-pp"></div>
+            <div class="dp-fund-right">
+              <div class="dp-nav" id="pp-nav">₹—</div>
+              <div class="dp-return">3Y: +22.1%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dp-fund" onclick="askQ('Tell me about Mirae Asset Large Cap Fund — performance vs Nifty 50 and expense ratio.')">
+          <div class="dp-fund-left">
+            <div class="dp-fund-name">Mirae Asset Large Cap</div>
+            <div class="dp-fund-meta">Direct Growth · Large Cap · Mirae</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="dp-sparkline" id="sp-mirae"></div>
+            <div class="dp-fund-right">
+              <div class="dp-nav" id="mirae-nav">₹—</div>
+              <div class="dp-return">3Y: +14.8%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dp-fund" onclick="askQ('Tell me about SBI Small Cap Fund — risk, returns and if it suits a long-term SIP.')">
+          <div class="dp-fund-left">
+            <div class="dp-fund-name">SBI Small Cap</div>
+            <div class="dp-fund-meta">Direct Growth · Small Cap · SBI MF</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="dp-sparkline" id="sp-sbi"></div>
+            <div class="dp-fund-right">
+              <div class="dp-nav" id="sbi-nav">₹—</div>
+              <div class="dp-return">3Y: +28.4%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dp-fund" onclick="askQ('Tell me about Nippon India Small Cap Fund — AUM, returns and risks.')">
+          <div class="dp-fund-left">
+            <div class="dp-fund-name">Nippon India Small Cap</div>
+            <div class="dp-fund-meta">Direct Growth · Small Cap · Nippon</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="dp-sparkline" id="sp-nippon"></div>
+            <div class="dp-fund-right">
+              <div class="dp-nav" id="nippon-nav">₹—</div>
+              <div class="dp-return">3Y: +32.6%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dp-footer">
+          <span class="dp-footer-text" id="nav-updated">Fetching live NAV…</span>
+          <button class="dp-refresh" onclick="loadLiveNav()">↻ Refresh</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trust strip -->
+  <div class="trust-strip">
+    <div class="trust-item"><span class="trust-icon">📡</span> Live AMFI data via mfapi.in</div>
+    <div class="trust-div"></div>
+    <div class="trust-item"><span class="trust-icon">🤖</span> Powered by Claude AI</div>
+    <div class="trust-div"></div>
+    <div class="trust-item"><span class="trust-icon">🔒</span> Razorpay secured billing</div>
+    <div class="trust-div"></div>
+    <div class="trust-item"><span class="trust-icon">⚠️</span> Research only — not investment advice</div>
+  </div>
+
+  <!-- Features -->
+  <div class="features">
+    <div class="section-label">What you get</div>
+    <div class="section-title">Everything you need to research smarter.</div>
+    <div class="feat-grid">
+      <div class="feat-card" onclick="showSec('chat',document.querySelectorAll('.nav-tab')[1])">
+        <div class="feat-num">🤖</div>
+        <div class="feat-title">Ask AI Anything</div>
+        <div class="feat-desc">"Which flexi cap fund beat its benchmark for 5 years straight?" — instant, data-backed answers powered by Claude.</div>
+      </div>
+      <div class="feat-card" onclick="showSec('screener',document.querySelectorAll('.nav-tab')[2])">
+        <div class="feat-num">🔍</div>
+        <div class="feat-title">Fund Screener</div>
+        <div class="feat-desc">Filter 2,500+ funds by returns, AUM, expense ratio, category — with live NAV updated 6× daily from AMFI.</div>
+      </div>
+      <div class="feat-card" onclick="showSec('portfolio',document.querySelectorAll('.nav-tab')[3])">
+        <div class="feat-num">📊</div>
+        <div class="feat-title">Portfolio Tracker</div>
+        <div class="feat-desc">Import your CAS statement. Instant XIRR, fund-wise P&L, asset allocation — zero manual entry.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">🔀</div>
+        <div class="feat-title">Overlap Analyser</div>
+        <div class="feat-desc">Discover if your 6 funds all hold the same top 10 stocks. Eliminate hidden concentration risk automatically.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">🧾</div>
+        <div class="feat-title">Tax P&L Engine</div>
+        <div class="feat-desc">Auto-compute LTCG and STCG from your CAS. Know exactly what to harvest before March 31.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">🔔</div>
+        <div class="feat-title">Smart Alerts</div>
+        <div class="feat-desc">Fund manager changes, expense ratio hikes, AUM drops, benchmark underperformance — know before others do.</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>FundIQ is an AI-powered research and information platform. Not a SEBI-registered investment advisor. All content is for educational and research purposes only. Past performance is not indicative of future results. Please consult a SEBI-registered advisor before making investment decisions.</footer>
+</section>
+
+<!-- ════════════════ CHAT ════════════════ -->
+<section id="chat" class="sec">
+  <div class="chat-layout">
+    <div class="c-sidebar">
+      <div class="c-s-top">
+        <div class="c-s-label">FundIQ AI</div>
+        <div class="c-search-wrap">
+          <span style="color:var(--ink4);font-size:14px">⌕</span>
+          <input placeholder="Search a fund…" id="fund-search" oninput="fundSearch(this.value)">
+        </div>
+      </div>
+      <div id="search-results" style="display:none;padding:6px;border-bottom:1px solid var(--border)"></div>
+      <button class="c-new-btn" onclick="clearChat()">+ New conversation</button>
+      <div class="c-prompts">
+        <div class="c-prompt-group-label">Fund Analysis</div>
+        <div class="p-chip" onclick="askQ('Which large cap funds have consistently beaten the Nifty 50 for 3 years?')">Which large cap funds beat Nifty 50 for 3 years?</div>
+        <div class="p-chip" onclick="askQ('Compare Parag Parikh Flexi Cap vs HDFC Flexi Cap — expense ratio, returns and risks')">Parag Parikh vs HDFC Flexi Cap</div>
+        <div class="p-chip" onclick="askQ('Best ELSS funds for Section 80C tax saving in FY 2025?')">Best ELSS funds for 80C?</div>
+        <div class="p-chip" onclick="askQ('Which small cap funds have AUM above 10,000 crore and 5Y returns above 25%?')">Small cap funds — AUM + returns filter</div>
+        <div class="c-prompt-group-label">Concepts</div>
+        <div class="p-chip" onclick="askQ('Explain rolling returns vs point-to-point returns with an example')">Rolling returns explained</div>
+        <div class="p-chip" onclick="askQ('How does expense ratio impact my SIP returns over 20 years? Show an example.')">Expense ratio impact on SIP</div>
+        <div class="p-chip" onclick="askQ('What is the difference between direct and regular mutual fund plans?')">Direct vs Regular plan</div>
+        <div class="c-prompt-group-label">Tax</div>
+        <div class="p-chip" onclick="askQ('Explain LTCG and STCG tax on equity mutual funds after Budget 2024 changes')">LTCG & STCG after Budget 2024</div>
+        <div class="p-chip" onclick="askQ('How does ELSS lock-in work and can I redeem partially after 3 years?')">ELSS lock-in and redemption rules</div>
+      </div>
+    </div>
+
+    <div class="c-main">
+      <div class="c-msgs" id="chat-msgs">
+        <div class="msg bot">
+          <div class="lbl"><div class="ai-avatar">F</div> FundIQ AI</div>
+          <div class="bubble">
+            Hello! I'm your AI mutual fund research analyst, powered by Claude.<br><br>
+            I can help you <strong>compare funds</strong>, decode <strong>expense ratios and returns</strong>, explain <strong>tax rules</strong>, analyse <strong>portfolio overlap</strong>, and much more — all for India's 2,500+ SEBI-registered mutual funds.<br><br>
+            What would you like to research today?
+          </div>
+        </div>
+      </div>
+      <div class="c-input-area">
+        <div class="c-input-wrap">
+          <textarea class="c-textarea" id="chat-in" placeholder="Ask about any fund, category or concept…" rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
+            oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+          <button class="c-send" onclick="sendMsg()">↑</button>
+        </div>
+        <div class="c-hint">Claude AI · Research only · Not investment advice · <span id="q-left">10 queries left on free plan</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ SCREENER ════════════════ -->
+<section id="screener" class="sec">
+  <div class="scr-layout">
+    <div class="pg-header">
+      <div class="pg-title">Fund Screener</div>
+      <div class="pg-sub">
+        Filter 2,500+ Indian mutual funds
+        <span class="live-pill"><span class="live-pip"></span>Live NAV from AMFI</span>
+      </div>
+    </div>
+    <div class="filter-row">
+      <input class="scr-search" placeholder="Search fund or AMC…" id="scr-q" oninput="renderScr()">
+      <select class="fsel" id="f-cat" onchange="renderScr()">
+        <option value="">All Categories</option>
+        <option value="equity">Equity</option>
+        <option value="debt">Debt</option>
+        <option value="hybrid">Hybrid</option>
+      </select>
+      <select class="fsel" id="f-sort" onchange="renderScr()">
+        <option value="r3">3Y Return ↓</option>
+        <option value="r1">1Y Return ↓</option>
+        <option value="r5">5Y Return ↓</option>
+        <option value="aum">AUM ↓</option>
+        <option value="exp">Expense ↑</option>
+      </select>
+      <select class="fsel" id="f-min" onchange="renderScr()">
+        <option value="0">Min 3Y: Any</option>
+        <option value="10">10%+</option>
+        <option value="15">15%+</option>
+        <option value="20">20%+</option>
+        <option value="25">25%+</option>
+      </select>
+    </div>
+    <div class="tbl-card" style="overflow-x:auto">
+      <table class="scr-tbl">
+        <thead>
+          <tr>
+            <th style="min-width:260px">Fund</th>
+            <th>Category</th>
+            <th id="th1" onclick="sortF('r1')">1Y ↕</th>
+            <th id="th3" class="sorted" onclick="sortF('r3')">3Y ↕</th>
+            <th id="th5" onclick="sortF('r5')">5Y ↕</th>
+            <th id="tha" onclick="sortF('aum')">AUM ↕</th>
+            <th>Exp Ratio</th>
+            <th>Rating</th>
+            <th>Trend</th>
+          </tr>
+        </thead>
+        <tbody id="scr-body"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:var(--ink4)">Data from mfapi.in (AMFI) · Free, no auth · Updated 6× daily · Indicative returns · Not investment advice</div>
+  </div>
+</section>
+
+<!-- ════════════════ PORTFOLIO ════════════════ -->
+<section id="portfolio" class="sec">
+  <div class="port-layout">
+    <div class="pg-header">
+      <div class="pg-title">Portfolio Tracker</div>
+      <div class="pg-sub">Import your CAMS or Karvy CAS statement — zero manual entry</div>
+    </div>
+    <div class="upload-card" id="upload-card" onclick="loadDemo()">
+      <div class="u-icon">📂</div>
+      <div class="u-title">Upload CAS Statement (PDF)</div>
+      <div class="u-sub">Drop your CAMS / Karvy statement here · Or <span class="u-link">load demo portfolio</span></div>
+    </div>
+    <div id="port-content" style="display:none">
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-label">Total Invested</div><div class="kpi-val">₹12,40,000</div><div class="kpi-sub">Across 6 funds</div></div>
+        <div class="kpi"><div class="kpi-label">Current Value</div><div class="kpi-val g">₹17,83,420</div><div class="kpi-sub">As of today</div></div>
+        <div class="kpi"><div class="kpi-label">Total Gain</div><div class="kpi-val g">+₹5,43,420</div><div class="kpi-sub">+43.8% absolute</div></div>
+        <div class="kpi"><div class="kpi-label">XIRR</div><div class="kpi-val g">18.4%</div><div class="kpi-sub">Annualised return</div></div>
+      </div>
+
+      <div class="pcard" style="margin-bottom:16px">
+        <div class="pcard-title">Asset Allocation</div>
+        <div class="alloc-bar">
+          <div class="a-seg" style="width:62%;background:#22a060"></div>
+          <div class="a-seg" style="width:22%;background:#1a5276"></div>
+          <div class="a-seg" style="width:16%;background:#b8860b"></div>
+        </div>
+        <div style="display:flex;gap:20px">
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2)"><span style="width:10px;height:10px;background:#22a060;border-radius:2px;display:block"></span>Equity 62%</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2)"><span style="width:10px;height:10px;background:#1a5276;border-radius:2px;display:block"></span>Debt 22%</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2)"><span style="width:10px;height:10px;background:#b8860b;border-radius:2px;display:block"></span>Hybrid 16%</div>
+        </div>
+      </div>
+
+      <div class="port-grid">
+        <div class="pcard">
+          <div class="pcard-title">Holdings</div>
+          <div class="h-row"><div class="hbar" style="background:#22a060"></div><div class="hi"><div class="hn">Parag Parikh Flexi Cap</div><div class="hm">Equity · Flexi Cap · Direct</div></div><div class="ha"><div class="hv">₹4,82,340</div><div class="hg">+52.3% · XIRR 21.4%</div></div></div>
+          <div class="h-row"><div class="hbar" style="background:#1a5276"></div><div class="hi"><div class="hn">Mirae Asset Large Cap</div><div class="hm">Equity · Large Cap · Direct</div></div><div class="ha"><div class="hv">₹3,21,800</div><div class="hg">+38.1% · XIRR 16.2%</div></div></div>
+          <div class="h-row"><div class="hbar" style="background:#b8860b"></div><div class="hi"><div class="hn">SBI Small Cap</div><div class="hm">Equity · Small Cap · Direct</div></div><div class="ha"><div class="hv">₹2,94,600</div><div class="hg">+61.2% · XIRR 24.8%</div></div></div>
+          <div class="h-row"><div class="hbar" style="background:#7b61ff"></div><div class="hi"><div class="hn">HDFC Corporate Bond</div><div class="hm">Debt · Corp Bond · Direct</div></div><div class="ha"><div class="hv">₹2,84,680</div><div class="hg">+18.4% · XIRR 7.8%</div></div></div>
+          <div class="h-row"><div class="hbar" style="background:#c0392b"></div><div class="hi"><div class="hn">Axis ELSS Tax Saver</div><div class="hm">Equity · ELSS · Direct</div></div><div class="ha"><div class="hv">₹2,18,000</div><div class="hg neg">+12.1% · XIRR 5.4%</div></div></div>
+          <div class="h-row"><div class="hbar" style="background:#0e7490"></div><div class="hi"><div class="hn">Kotak Balanced Advantage</div><div class="hm">Hybrid · Dynamic Alloc.</div></div><div class="ha"><div class="hv">₹1,82,000</div><div class="hg">+28.6% · XIRR 12.3%</div></div></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="pcard">
+            <div class="pcard-title">⚠️ Overlap Analysis</div>
+            <div style="font-size:13px;color:var(--ink2);margin-bottom:12px;line-height:1.5">Your equity funds share significant common holdings:</div>
+            <table class="overlap-tbl">
+              <thead><tr><th>Stock</th><th>Funds Holding</th><th>Severity</th></tr></thead>
+              <tbody>
+                <tr><td>HDFC Bank</td><td>4 of 4 equity funds</td><td><span class="sev-h">Very High</span></td></tr>
+                <tr><td>Infosys</td><td>3 of 4 equity funds</td><td><span class="sev-h">High</span></td></tr>
+                <tr><td>Reliance Ind.</td><td>3 of 4 equity funds</td><td><span class="sev-h">High</span></td></tr>
+                <tr><td>ICICI Bank</td><td>2 of 4 equity funds</td><td><span class="sev-m">Medium</span></td></tr>
+              </tbody>
+            </table>
+            <div class="ai-hint">💡 <strong>AI Suggestion:</strong> Replace Axis ELSS (underperforming, high overlap) with a mid cap or international fund for better diversification.</div>
+          </div>
+          <div class="pcard">
+            <div class="pcard-title">Tax Summary — FY 2024-25</div>
+            <div class="tax-row">
+              <div class="tax-cell"><div class="tax-label">LTCG (Taxable)</div><div class="tax-val" style="color:var(--green)">₹1,24,800</div><div class="tax-sub">12.5% above ₹1.25L</div></div>
+              <div class="tax-cell"><div class="tax-label">STCG</div><div class="tax-val" style="color:var(--gold)">₹18,200</div><div class="tax-sub">20% flat rate</div></div>
+            </div>
+            <div style="margin-top:12px;font-size:13px;color:var(--ink2);line-height:1.5">💰 Harvest ₹2,400 in unrealised losses from Axis ELSS to reduce LTCG liability before March 31.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ PRICING ════════════════ -->
+<section id="pricing" class="sec">
+  <div class="pricing-layout">
+    <div class="pricing-head">
+      <div class="section-label">Pricing</div>
+      <div class="pricing-title">Research smarter.<br><span class="hl">Pay less.</span></div>
+      <div class="pricing-sub">Start free. Upgrade when you need more power.</div>
+      <div class="price-toggle">
+        <button class="pt-opt" id="tog-m" onclick="setPricing('monthly')">Monthly</button>
+        <button class="pt-opt active" id="tog-y" onclick="setPricing('yearly')">Yearly <span class="save-chip">Save 40%</span></button>
+      </div>
+    </div>
+
+    <div class="plans">
+      <div class="plan">
+        <div class="plan-tier">Standard</div>
+        <div class="plan-price">Free</div>
+        <div class="plan-period">Forever</div>
+        <div class="plan-saving">&nbsp;</div>
+        <div class="plan-div"></div>
+        <div class="plan-feat"><span class="fck">✓</span>10 AI queries/month</div>
+        <div class="plan-feat"><span class="fck">✓</span>Basic screener</div>
+        <div class="plan-feat"><span class="fck">✓</span>1-year NAV history</div>
+        <div class="plan-feat"><span class="fck">✓</span>Compare 3 funds</div>
+        <div class="plan-feat"><span class="fx">✗</span><span style="color:var(--ink4)">CAS import</span></div>
+        <div class="plan-feat"><span class="fx">✗</span><span style="color:var(--ink4)">Overlap analyser</span></div>
+        <button class="plan-btn pb-out">Start Free</button>
+      </div>
+      <div class="plan hot">
+        <div class="plan-tier">Premium</div>
+        <div class="plan-price" id="pp">₹5,999</div>
+        <div class="plan-period" id="pp2">/year · ~₹500/mo</div>
+        <div class="plan-saving" id="pp3">You save ₹4,000 vs monthly</div>
+        <div class="plan-div"></div>
+        <div class="plan-feat"><span class="fck">✓</span>500 AI queries/month</div>
+        <div class="plan-feat"><span class="fck">✓</span>Advanced screener</div>
+        <div class="plan-feat"><span class="fck">✓</span>10-year NAV history</div>
+        <div class="plan-feat"><span class="fck">✓</span>CAS portfolio import</div>
+        <div class="plan-feat"><span class="fck">✓</span>Overlap analyser</div>
+        <div class="plan-feat"><span class="fck">✓</span>Daily AI alerts</div>
+        <button class="plan-btn pb-fill" onclick="openModal()">Upgrade →</button>
+      </div>
+      <div class="plan">
+        <div class="plan-tier">Professional</div>
+        <div class="plan-price" id="pro">₹9,999</div>
+        <div class="plan-period" id="pro2">/year · ~₹833/mo</div>
+        <div class="plan-saving" id="pro3">You save ₹6,000 vs monthly</div>
+        <div class="plan-div"></div>
+        <div class="plan-feat"><span class="fck">✓</span>1,000 AI queries/month</div>
+        <div class="plan-feat"><span class="fck">✓</span>20-year full NAV history</div>
+        <div class="plan-feat"><span class="fck">✓</span>Tax P&L engine</div>
+        <div class="plan-feat"><span class="fck">✓</span>Rolling return charts</div>
+        <div class="plan-feat"><span class="fck">✓</span>Real-time alerts</div>
+        <div class="plan-feat"><span class="fck">✓</span>Data export CSV/PDF</div>
+        <button class="plan-btn pb-grn" onclick="openModal()">Upgrade to Pro →</button>
+      </div>
+      <div class="plan">
+        <div class="plan-tier">Enterprise</div>
+        <div class="plan-price" style="font-size:26px">Custom</div>
+        <div class="plan-period">For IFAs & institutions</div>
+        <div class="plan-saving">&nbsp;</div>
+        <div class="plan-div"></div>
+        <div class="plan-feat"><span class="fck">✓</span>White-label branding</div>
+        <div class="plan-feat"><span class="fck">✓</span>API access</div>
+        <div class="plan-feat"><span class="fck">✓</span>Team accounts</div>
+        <div class="plan-feat"><span class="fck">✓</span>Client-wise reports</div>
+        <div class="plan-feat"><span class="fck">✓</span>Custom AI workflows</div>
+        <div class="plan-feat"><span class="fck">✓</span>Unlimited everything</div>
+        <button class="plan-btn pb-out" onclick="showToast('ok','Our team will reach you within 24 hrs.')">Contact Sales</button>
+      </div>
+    </div>
+
+    <div class="rzp-bar">
+      <div class="rzp-icon">🔒</div>
+      <div class="rzp-txt"><strong>Payments powered by Razorpay.</strong> Accepts UPI, Credit/Debit Cards, NetBanking. No setup fee — you only pay 2% per transaction when revenue comes in. Cancel subscriptions anytime.</div>
+    </div>
+
+    <div class="comp-section">
+      <div class="comp-title">Full feature comparison</div>
+      <div class="comp-wrap">
+        <table class="ctbl">
+          <thead><tr><th style="min-width:180px">Feature</th><th>Standard</th><th style="color:var(--green)">Premium</th><th>Professional</th><th>Enterprise</th></tr></thead>
+          <tbody>
+            <tr><td>AI Queries/month</td><td>10</td><td>500</td><td>1,000</td><td>Unlimited</td></tr>
+            <tr><td>NAV History</td><td>1 year</td><td>10 years</td><td>20 years</td><td>All</td></tr>
+            <tr><td>Fund Comparison</td><td>3 funds</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
+            <tr><td>CAS Import</td><td><span class="cd">—</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>Overlap Analyser</td><td><span class="cd">—</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>Tax P&L Engine</td><td><span class="cd">—</span></td><td><span class="cd">—</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>Data Export</td><td><span class="cd">—</span></td><td><span class="cd">—</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+            <tr><td>API Access</td><td><span class="cd">—</span></td><td><span class="cd">—</span></td><td><span class="cd">—</span></td><td><span class="ck">✓</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <footer style="padding:32px 0 0;border-top:1px solid var(--border);margin-top:40px">FundIQ is a research platform. Not a SEBI-registered advisor. Content is for educational purposes only. Razorpay subscription charges apply as selected.</footer>
+  </div>
+</section>
+
+<script>
+// ─── FUNDS DATABASE ───
+const FUNDS = [
+  {code:120503,name:'Parag Parikh Flexi Cap',amc:'PPFAS',cat:'equity',sub:'Flexi Cap',r1:28.4,r3:22.1,r5:19.8,aum:72400,exp:0.63,stars:5,trend:[4,5,6,5,7,8,7,9]},
+  {code:118989,name:'Mirae Asset Large Cap',amc:'Mirae Asset',cat:'equity',sub:'Large Cap',r1:18.2,r3:14.8,r5:16.4,aum:38900,exp:0.54,stars:5,trend:[5,6,5,7,6,8,7,6]},
+  {code:125497,name:'SBI Small Cap',amc:'SBI MF',cat:'equity',sub:'Small Cap',r1:34.6,r3:28.4,r5:26.2,aum:26800,exp:0.67,stars:4,trend:[3,5,7,6,8,9,8,10]},
+  {code:100444,name:'HDFC Mid-Cap Opportunities',amc:'HDFC MF',cat:'equity',sub:'Mid Cap',r1:42.1,r3:31.2,r5:28.8,aum:68200,exp:0.72,stars:5,trend:[4,6,8,7,9,10,9,11]},
+  {code:120847,name:'Axis ELSS Tax Saver',amc:'Axis MF',cat:'equity',sub:'ELSS',r1:12.4,r3:9.8,r5:13.2,aum:34100,exp:0.68,stars:3,trend:[6,5,4,5,4,5,4,4]},
+  {code:131103,name:'Kotak Balanced Advantage',amc:'Kotak MF',cat:'hybrid',sub:'Dynamic Alloc',r1:16.8,r3:13.4,r5:14.6,aum:18200,exp:0.58,stars:4,trend:[5,6,6,7,7,8,7,8]},
+  {code:119062,name:'HDFC Corporate Bond',amc:'HDFC MF',cat:'debt',sub:'Corp Bond',r1:8.4,r3:7.2,r5:8.1,aum:29400,exp:0.31,stars:4,trend:[6,6,7,7,7,8,8,8]},
+  {code:120505,name:'Nippon India Small Cap',amc:'Nippon',cat:'equity',sub:'Small Cap',r1:38.2,r3:32.6,r5:30.4,aum:45800,exp:0.74,stars:5,trend:[3,5,7,8,9,10,11,12]},
+  {code:119551,name:'Mirae Asset Tax Saver',amc:'Mirae Asset',cat:'equity',sub:'ELSS',r1:22.8,r3:17.4,r5:20.2,aum:22100,exp:0.54,stars:5,trend:[4,5,6,7,7,8,8,9]},
+  {code:120716,name:'SBI Liquid Fund',amc:'SBI MF',cat:'debt',sub:'Liquid',r1:7.1,r3:6.8,r5:6.4,aum:62100,exp:0.20,stars:4,trend:[7,7,7,7,8,8,8,8]},
+  {code:147622,name:'Quant Small Cap',amc:'Quant MF',cat:'equity',sub:'Small Cap',r1:48.6,r3:42.1,r5:38.4,aum:8200,exp:0.62,stars:5,trend:[3,5,9,8,11,12,10,13]},
+  {code:119775,name:'ICICI Pru Bluechip',amc:'ICICI Pru',cat:'equity',sub:'Large Cap',r1:20.4,r3:16.8,r5:17.2,aum:52800,exp:0.89,stars:4,trend:[5,6,5,7,7,8,7,8]},
+];
+
+// ─── NAV ───
+function showSec(id, el) {
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(el) el.classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='screener') renderScr();
+}
+
+// ─── LIVE NAV ───
+async function loadLiveNav() {
+  const funds = [
+    {code:120503, navEl:'pp-nav', spEl:'sp-pp'},
+    {code:118989, navEl:'mirae-nav', spEl:'sp-mirae'},
+    {code:125497, navEl:'sbi-nav', spEl:'sp-sbi'},
+    {code:120505, navEl:'nippon-nav', spEl:'sp-nippon'},
+  ];
+  let updated = false;
+  for(const f of funds) {
+    try {
+      const r = await fetch(`https://api.mfapi.in/mf/${f.code}`);
+      const d = await r.json();
+      const latest = d.data?.[0];
+      if(latest) {
+        const el = document.getElementById(f.navEl);
+        if(el) el.textContent = '₹' + parseFloat(latest.nav).toFixed(2);
+        // Sparkline from last 7 NAVs
+        const sp = document.getElementById(f.spEl);
+        if(sp && d.data?.length >= 7) {
+          const navs = d.data.slice(0,7).reverse().map(x=>parseFloat(x.nav));
+          const min = Math.min(...navs), max = Math.max(...navs), range = max-min||1;
+          sp.innerHTML = navs.map((v,i)=>{
+            const h = Math.round(4 + ((v-min)/range)*22);
+            const isHigh = i===navs.indexOf(Math.max(...navs));
+            return `<div class="sp-bar ${isHigh?'high':''}" style="height:${h}px"></div>`;
+          }).join('');
+        }
+        updated = true;
+      }
+    } catch(e){}
+  }
+  if(updated) {
+    const upd = document.getElementById('nav-updated');
+    if(upd) upd.textContent = 'Updated ' + new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  }
+}
+loadLiveNav();
+
+// ─── TOAST ───
+function showToast(type, msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'), 4000);
+}
+
+// ─── MODAL ───
+let selectedPlan = 'premium_yearly';
+function openModal() { document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+document.getElementById('modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
+
+function selPlan(el, plan) {
+  selectedPlan = plan;
+  document.querySelectorAll('.plan-opt').forEach(o=>{o.classList.remove('sel')});
+  el.classList.add('sel');
+}
+
+async function pay() {
+  const n=document.getElementById('up-name').value.trim();
+  const e=document.getElementById('up-email').value.trim();
+  const p=document.getElementById('up-phone').value.trim();
+  if(!n||!e||!p){showToast('err','Please fill all fields');return;}
+  showToast('ok','Demo: Razorpay checkout would open here in production.');
+  closeModal();
+}
+
+// ─── PRICING TOGGLE ───
+const PR = {
+  yearly:{pp:'₹5,999',pp2:'/year · ~₹500/mo',pp3:'You save ₹4,000 vs monthly',pro:'₹9,999',pro2:'/year · ~₹833/mo',pro3:'You save ₹6,000 vs monthly'},
+  monthly:{pp:'₹833',pp2:'/month',pp3:'',pro:'₹1,399',pro2:'/month',pro3:''}
+};
+function setPricing(m) {
+  const p=PR[m];
+  ['pp','pp2','pp3','pro','pro2','pro3'].forEach(k=>document.getElementById(k).textContent=p[k]);
+  document.getElementById('tog-m').classList.toggle('active',m==='monthly');
+  document.getElementById('tog-y').classList.toggle('active',m==='yearly');
+}
+
+// ─── SCREENER ───
+let scrSort='r3', scrDir=-1;
+function sortF(k) {
+  if(scrSort===k) scrDir*=-1; else{scrSort=k;scrDir=k==='exp'?1:-1;}
+  document.querySelectorAll('.scr-tbl th').forEach(t=>t.classList.remove('sorted'));
+  const map={r1:'th1',r3:'th3',r5:'th5',aum:'tha'};
+  if(map[k]) document.getElementById(map[k]).classList.add('sorted');
+  renderScr();
+}
+function renderScr() {
+  const q=(document.getElementById('scr-q')?.value||'').toLowerCase();
+  const cat=document.getElementById('f-cat')?.value||'';
+  const sk=document.getElementById('f-sort')?.value||'r3';
+  const minR=parseFloat(document.getElementById('f-min')?.value||0);
+  let funds=[...FUNDS];
+  if(q) funds=funds.filter(f=>f.name.toLowerCase().includes(q)||f.amc.toLowerCase().includes(q));
+  if(cat) funds=funds.filter(f=>f.cat===cat);
+  if(minR>0) funds=funds.filter(f=>f.r3>=minR);
+  const dir=sk==='exp'?1:-1;
+  funds.sort((a,b)=>dir*(a[sk]-b[sk]));
+  const tbody=document.getElementById('scr-body');
+  if(!funds.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--ink4);font-size:14px">No funds match your filters.</td></tr>';return;}
+  const colors={equity:'#22a060',debt:'#1a5276',hybrid:'#b8860b'};
+  tbody.innerHTML=funds.map(f=>{
+    const tagMap={equity:'t-eq',debt:'t-de',hybrid:'t-hy'};
+    const tag=`<span class="tag ${tagMap[f.cat]}">${f.cat.charAt(0).toUpperCase()+f.cat.slice(1)}</span>`;
+    const stars='★'.repeat(f.stars)+'☆'.repeat(5-f.stars);
+    const mx=Math.max(...f.trend),mn=Math.min(...f.trend),rng=mx-mn||1;
+    const sp=f.trend.map(v=>{
+      const h=Math.round(4+((v-mn)/rng)*26);
+      return `<div class="mb" style="height:${h}px;background:${f.r3>20?'#22a060':f.r3>10?'#1a5276':'#b8860b'};opacity:${0.4+0.6*((v-mn)/rng)}"></div>`;
+    }).join('');
+    return `<tr>
+      <td><div class="fn">${f.name}</div><div class="fm">${f.amc} · ${f.sub} · Direct Growth</div></td>
+      <td>${tag}</td>
+      <td class="${f.r1>=0?'rp':'rn'}">${f.r1>0?'+':''}${f.r1.toFixed(1)}%</td>
+      <td class="${f.r3>=0?'rp':'rn'}">${f.r3>0?'+':''}${f.r3.toFixed(1)}%</td>
+      <td class="${f.r5>=0?'rp':'rn'}">${f.r5>0?'+':''}${f.r5.toFixed(1)}%</td>
+      <td style="color:var(--ink2)">${(f.aum/100).toFixed(0)} Cr</td>
+      <td style="color:var(--ink2)">${f.exp.toFixed(2)}%</td>
+      <td><span class="stars">${stars}</span></td>
+      <td><div class="mini-chart">${sp}</div></td>
+    </tr>`;
+  }).join('');
+}
+renderScr();
+
+// ─── FUND SEARCH SIDEBAR ───
+let searchT;
+async function fundSearch(q) {
+  const res=document.getElementById('search-results');
+  clearTimeout(searchT);
+  if(!q||q.length<3){res.style.display='none';return;}
+  searchT=setTimeout(async()=>{
+    try{
+      const r=await fetch('https://api.mfapi.in/mf');
+      const all=await r.json();
+      const hits=all.filter(f=>f.schemeName.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+      res.style.display=hits.length?'block':'none';
+      res.innerHTML=hits.map(f=>`<div class="p-chip" onclick="askFromSearch(${f.schemeCode},'${f.schemeName.replace(/'/g,"\\'")}')"><div style="font-size:12px;color:var(--ink)">${f.schemeName}</div></div>`).join('');
+    }catch{res.style.display='none';}
+  },400);
+}
+function askFromSearch(code,name){
+  document.getElementById('search-results').style.display='none';
+  document.getElementById('fund-search').value='';
+  askQ(`Give me a detailed research summary of ${name} — returns (1Y/3Y/5Y), expense ratio, fund manager, benchmark comparison, risk level, and who should consider this fund.`);
+}
+
+// ─── AI CHAT ───
+const SYS=`You are FundIQ AI, India's expert mutual fund research analyst. Rules:
+1. RESEARCH ONLY — never say "buy" or "invest in this fund."
+2. End every response with: "⚠️ Research only — not investment advice."
+3. Use **bold** for key metrics. Use bullet points for lists.
+4. Be specific: expense ratios, AUM, rolling returns, Sharpe ratio, alpha, benchmark comparison.
+5. Tax rules 2024-25: Equity LTCG >1yr = 12.5% above ₹1.25L; STCG <1yr = 20%; Debt = slab rate.
+6. Top funds by category: Large Cap [Mirae 0.54%, HDFC Top 100 0.64%, ICICI Pru Bluechip 0.89%], Flexi Cap [Parag Parikh 0.63%, HDFC Flexi 0.80%], Small Cap [Nippon 0.74%, SBI 0.67%, Quant 0.62%], ELSS [Mirae Tax Saver 0.54%, DSP Tax Saver 0.58%].`;
+
+let hist=[], qLeft=10;
+async function sendMsg(){
+  const inp=document.getElementById('chat-in');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  inp.value='';inp.style.height='auto';
+  addMsg('user',txt);
+  hist.push({role:'user',content:txt});
+  showTyping();
+  qLeft=Math.max(0,qLeft-1);
+  document.getElementById('q-left').textContent=`${qLeft} queries left on free plan`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYS,messages:hist.slice(-10)})
+    });
+    const d=await r.json();
+    removeTyping();
+    const reply=d.content?.[0]?.text||'Sorry, please try again.';
+    hist.push({role:'assistant',content:reply});
+    addMsg('bot',reply);
+  }catch{
+    removeTyping();
+    addMsg('bot','⚠️ AI unavailable in standalone demo mode. In the full deployed version, this connects to Claude AI for real-time fund research.\n\n⚠️ Research only — not investment advice.');
+  }
+}
+function addMsg(role,text){
+  const msgs=document.getElementById('chat-msgs');
+  const div=document.createElement('div');
+  div.className=`msg ${role}`;
+  const lbl=role==='bot'?`<div class="lbl"><div class="ai-avatar">F</div> FundIQ AI</div>`:`<div class="lbl" style="justify-content:flex-end">You</div>`;
+  const fmt=text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/⚠️(.*?)(<br>|$)/g,'<span style="color:var(--gold)">⚠️$1</span>$2');
+  div.innerHTML=`${lbl}<div class="bubble">${fmt}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function showTyping(){
+  const msgs=document.getElementById('chat-msgs');
+  const d=document.createElement('div');
+  d.className='msg bot';d.id='typing';
+  d.innerHTML=`<div class="lbl"><div class="ai-avatar">F</div> FundIQ AI</div><div class="bubble"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+}
+function removeTyping(){const t=document.getElementById('typing');if(t)t.remove();}
+function askQ(q){
+  showSec('chat',document.querySelectorAll('.nav-tab')[1]);
+  setTimeout(()=>{document.getElementById('chat-in').value=q;sendMsg();},150);
+}
+function clearChat(){
+  hist=[];
+  document.getElementById('chat-msgs').innerHTML=`<div class="msg bot"><div class="lbl"><div class="ai-avatar">F</div> FundIQ AI</div><div class="bubble">New conversation started. What would you like to research today?</div></div>`;
+}
+
+// ─── PORTFOLIO ───
+function loadDemo(){
+  document.getElementById('upload-card').style.display='none';
+  document.getElementById('port-content').style.display='block';
+  showToast('ok','Demo portfolio loaded!');
+}
+</script>
+</body>
+</html>

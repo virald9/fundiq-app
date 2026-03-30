@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "name": "fundiq",
+  "builds": [
+    {
+      "src": "backend/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "frontend/*.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/$1"
+    }
+  ],
+  "env": {
+    "ANTHROPIC_API_KEY": "@anthropic_api_key",
+    "RAZORPAY_KEY_ID": "@razorpay_key_id",
+    "RAZORPAY_KEY_SECRET": "@razorpay_key_secret",
+    "RAZORPAY_WEBHOOK_SECRET": "@razorpay_webhook_secret",
+    "RZP_PLAN_PREM_MONTHLY": "@rzp_plan_prem_monthly",
+    "RZP_PLAN_PREM_YEARLY": "@rzp_plan_prem_yearly",
+    "RZP_PLAN_PRO_MONTHLY": "@rzp_plan_pro_monthly",
+    "RZP_PLAN_PRO_YEARLY": "@rzp_plan_pro_yearly"
+  },
+  "regions": ["bom1"]
+}
